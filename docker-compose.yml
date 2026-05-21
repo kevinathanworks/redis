@@ -1,0 +1,25 @@
+services:
+  source-db:
+    image: redis:7
+    container_name: source-db
+    ports:
+      - "6379:6379"
+
+  replica-db:
+    image: redis:7
+    container_name: replica-db
+    ports:
+      - "6380:6379"
+    # Tell replica-db to mirror everything from source-db
+    command: redis-server --replicaof source-db 6379
+    depends_on:
+      - source-db
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - source-db
+      - replica-db
