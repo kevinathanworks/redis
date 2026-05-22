@@ -4,13 +4,14 @@ services:
     container_name: source-db
     ports:
       - "6379:6379"
+    mem_limit: 2g
 
   replica-db:
     image: redis:7
     container_name: replica-db
     ports:
       - "6380:6379"
-    # Tell replica-db to mirror everything from source-db
+    mem_limit: 2g
     command: redis-server --replicaof source-db 6379
     depends_on:
       - source-db

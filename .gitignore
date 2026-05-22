@@ -1,3 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
+
+# Personal study notes — not for version control
+notes.txt

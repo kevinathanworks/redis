@@ -7,7 +7,7 @@ This project demonstrates how to set up two Redis databases, enable replication 
 ## Project Structure
 
 ```
-redis/
+exercise 1/
 ├── docker-compose.yml       # Spins up source-db, replica-db, and RedisInsight UI
 ├── redis_sync.py            # Python script: inserts 1-100 into source-db, reads reversed from replica-db
 ├── memtier_benchmark.txt    # The memtier_benchmark command used to load test source-db
@@ -21,6 +21,7 @@ redis/
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - Python 3.x
 - `redis` Python library → `pip install redis`
+- `memtier_benchmark` installed on the load node
 
 ---
 
@@ -34,11 +35,11 @@ docker compose up -d
 
 This starts three containers:
 
-| Container | Role | Port |
-|---|---|---|
-| `source-db` | Primary database | `6379` |
-| `replica-db` | Replica — mirrors source-db automatically | `6380` |
-| `redisinsight` | Web UI to browse both databases | `5540` |
+| Container | Role | Port | Memory Limit |
+|---|---|---|---|
+| `source-db` | Primary database | `6379` | 2 GB |
+| `replica-db` | Replica — mirrors source-db automatically | `6380` | 2 GB |
+| `redisinsight` | Web UI to browse both databases | `5540` | — |
 
 ### 2. Open RedisInsight (optional)
 
@@ -46,22 +47,35 @@ Go to **http://localhost:5540** and add two database connections:
 
 | Field | source-db | replica-db |
 |---|---|---|
-| Host | `source-db` | `replica-db` |
-| Port | `6379` | `6379` |
-
-> Use the container names as the host (not `localhost`) since RedisInsight runs inside the Docker network.
+| Host | `localhost` | `localhost` |
+| Port | `6379` | `6380` |
 
 ---
 
 ## Load Testing with memtier_benchmark
 
-Run the following command to populate `source-db` with test data:
+Run the following command on the load node to populate `source-db` with test data:
 
 ```bash
-docker run --rm --network redis_default redislabs/memtier_benchmark --server=source-db --port=6379 --protocol=redis --threads=4 --clients=25 --requests=10000 --data-size=128 --key-prefix="mb:" --no-expiry --ratio=1:0
+memtier_benchmark \
+  --server=localhost \
+  --port=6379 \
+  --protocol=redis \
+  --threads=4 \
+  --clients=25 \
+  --requests=10000 \
+  --data-size=128 \
+  --key-prefix="mb:" \
+  --key-minimum=1 \
+  --key-maximum=100000 \
+  --no-expiry \
+  --ratio=1:0 \
+  --pipeline=10 \
+  --run-count=1 \
+  --hide-histogram
 ```
 
-The exact command used is also saved in `memtier_benchmark.txt`.
+The exact command used is saved in `memtier_benchmark.txt`.
 
 ---
 
@@ -72,7 +86,7 @@ python redis_sync.py
 ```
 
 The script will:
-1. Connect to `source-db` and `replica-db`
+1. Connect to `source-db` on `localhost:6379` and `replica-db` on `localhost:6380`
 2. Insert the values **1–100** into `source-db` as a Redis List
 3. Wait 2 seconds for replication to propagate
 4. Read and print the values in **reverse order** (100 → 1) from `replica-db`
@@ -95,9 +109,7 @@ Values in reverse order from replica-db (100 entries):
 1
 ```
 
-### Custom endpoints
-
-If connecting to a remote Redis Enterprise cluster instead of Docker:
+### Custom endpoints (Redis Enterprise cluster)
 
 ```bash
 python redis_sync.py \
@@ -111,7 +123,7 @@ python redis_sync.py \
 
 ### Chosen: Redis List
 
-Values 1–100 are stored using `RPUSH exercise1:values 1 2 … 100`.  
+Values 1–100 are stored using `RPUSH exercise1:values 1 2 … 100`.
 Reverse reading is done with `LRANGE 0 -1` and Python's `reversed()`.
 
 **Why a List?**
