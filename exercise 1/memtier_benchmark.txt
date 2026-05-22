@@ -1,12 +1,6 @@
-# memtier_benchmark command run on the load node to populate source-db
-#
-# Replace <source-db-host> and <source-db-port> with your actual values.
-# This runs 4 threads × 25 clients = 100 concurrent connections,
-# 10 000 requests per client, 128-byte random values, no key expiry.
-
 memtier_benchmark \
-  --server=<source-db-host> \
-  --port=<source-db-port> \
+  --server=localhost \
+  --port=6379 \
   --protocol=redis \
   --threads=4 \
   --clients=25 \
@@ -20,16 +14,3 @@ memtier_benchmark \
   --pipeline=10 \
   --run-count=1 \
   --hide-histogram
-
-# Example with a real cluster endpoint:
-# memtier_benchmark \
-#   --server=redis-12000.mycluster.local \
-#   --port=12000 \
-#   --protocol=redis \
-#   --threads=4 \
-#   --clients=25 \
-#   --requests=10000 \
-#   --data-size=128 \
-#   --key-prefix="mb:" \
-#   --no-expiry \
-#   --ratio=1:0
