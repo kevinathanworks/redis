@@ -29,6 +29,8 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+> **Note:** This cluster uses RBAC (Role-Based Access Control). Users are assigned roles via `role_uids` instead of a plain `role` string. The script automatically creates any missing roles before creating users and is safe to re-run (it cleans up existing users first).
+
 ---
 
 ## What the Script Does
