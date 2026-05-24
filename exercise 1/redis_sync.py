@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-"""
-Redis Enterprise Exercise 1 — Building and Synchronizing Redis Databases
-
-Inserts values 1-100 into source-db using a Redis List, then reads and
-prints them in reverse order from replica-db.
-
-Usage:
-    pip install redis
-    python redis_sync.py [--source-host HOST] [--source-port PORT]
-                         [--replica-host HOST] [--replica-port PORT]
-"""
-
 import argparse
 import time
 import sys
@@ -23,7 +11,7 @@ DEFAULT_SOURCE_PORT  = 6379
 DEFAULT_REPLICA_HOST = "localhost"
 DEFAULT_REPLICA_PORT = 6380
 LIST_KEY             = "exercise1:values"
-REPLICATION_WAIT_SEC = 2          # seconds to let async replication settle
+REPLICATION_WAIT_SEC = 2 
 # ────────────────────────────────────────────────────────────────────────────
 
 

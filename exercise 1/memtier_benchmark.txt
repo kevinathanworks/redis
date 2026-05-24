@@ -1,16 +1,1 @@
-memtier_benchmark \
-  --server=localhost \
-  --port=6379 \
-  --protocol=redis \
-  --threads=4 \
-  --clients=25 \
-  --requests=10000 \
-  --data-size=128 \
-  --key-prefix="mb:" \
-  --key-minimum=1 \
-  --key-maximum=100000 \
-  --no-expiry \
-  --ratio=1:0 \
-  --pipeline=10 \
-  --run-count=1 \
-  --hide-histogram
+memtier_benchmark --server=redis-10903.re-cluster1.ps-redislabs.org --port=10903 --protocol=redis --threads=4 --clients=25 --requests=10000 --data-size=128 --key-prefix="mb:" --ratio=1:0 --pipeline=10 --run-count=1 --hide-histogram
